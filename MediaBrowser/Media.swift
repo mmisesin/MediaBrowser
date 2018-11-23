@@ -34,10 +34,10 @@ open class Media: NSObject {
     /// underlyingImage
     public var underlyingImage: UIImage?
     public var placeholderImage: UIImage?
+    public var photoURL: URL?
 
     private let uuid = NSUUID().uuidString
     private var image: UIImage?
-    private var photoURL: URL?
     private var asset: PHAsset?
     private var avAsset: AVAsset?
     private var assetTargetSize = CGSize.zero
