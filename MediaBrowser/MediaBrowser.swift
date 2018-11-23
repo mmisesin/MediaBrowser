@@ -1667,6 +1667,9 @@ open class MediaBrowser: UIViewController, UIScrollViewDelegate, UIActionSheetDe
         
         // Get video and play
         if let p = photo {
+            if let asset = p.getVideoAsset() {
+                self.playVideo(asset: asset, atPhotoIndex: index)
+            }
             p.getVideoURL() { url in
                 if let u = url {
                     DispatchQueue.main.async() {
@@ -1679,16 +1682,19 @@ open class MediaBrowser: UIViewController, UIScrollViewDelegate, UIActionSheetDe
         }
     }
 
-    func playVideo(videoURL: URL, atPhotoIndex index: Int) {
+    func playVideo(asset: AVAsset? = nil, videoURL: URL? = nil, atPhotoIndex index: Int) {
         // Setup player
-
-        if let accessToken = delegate?.accessToken(for: videoURL) {
-            let headerFields: [String: String] = ["Authorization": accessToken]
-            let urlAsset = AVURLAsset(url: videoURL, options: ["AVURLAssetHTTPHeaderFieldsKey": headerFields])
-            let playerItem = AVPlayerItem(asset: urlAsset)
-            currentVideoPlayerViewController.player = AVPlayer(playerItem: playerItem)
-        } else {
-            currentVideoPlayerViewController.player = AVPlayer(url: videoURL)
+        if let asset = asset {
+            currentVideoPlayerViewController.player = AVPlayer(playerItem: AVPlayerItem(asset: asset))
+        } else if let videoURL = videoURL {
+            if let accessToken = delegate?.accessToken(for: videoURL) {
+                let headerFields: [String: String] = ["Authorization": accessToken]
+                let urlAsset = AVURLAsset(url: videoURL, options: ["AVURLAssetHTTPHeaderFieldsKey": headerFields])
+                let playerItem = AVPlayerItem(asset: urlAsset)
+                currentVideoPlayerViewController.player = AVPlayer(playerItem: playerItem)
+            } else {
+                currentVideoPlayerViewController.player = AVPlayer(url: videoURL)
+            }
         }
 
         if #available(iOS 9.0, *) {

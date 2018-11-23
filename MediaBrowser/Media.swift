@@ -11,6 +11,7 @@ import UIKit
 import AssetsLibrary
 import Photos
 import SDWebImage
+import AVFoundation
 
 let MEDIA_LOADING_DID_END_NOTIFICATION  = "MEDIA_LOADING_DID_END_NOTIFICATION"
 let MEDIA_PROGRESS_NOTIFICATION  = "MEDIA_PROGRESS_NOTIFICATION"
@@ -38,6 +39,7 @@ open class Media: NSObject {
     private var image: UIImage?
     private var photoURL: URL?
     private var asset: PHAsset?
+    private var avAsset: AVAsset?
     private var assetTargetSize = CGSize.zero
     
     private var loadingInProgress = false
@@ -73,6 +75,15 @@ open class Media: NSObject {
     public convenience init(url: URL) {
         self.init()
         self.photoURL = url
+    }
+    
+    public convenience init(asset: AVAsset) {
+        self.init()
+        
+        self.avAsset = asset
+        isVideo = true
+        
+        loadThumbnail()
     }
 
     /// init with PHAsset and targetSize
@@ -136,6 +147,10 @@ open class Media: NSObject {
         
         return completion(nil)
     }
+    
+    func getVideoAsset() -> AVAsset? {
+        return avAsset
+    }
 
     //MARK: - Photo Protocol Methods
     func loadUnderlyingImageAndNotify() {
@@ -186,6 +201,21 @@ open class Media: NSObject {
         } else {
             // Image is empty
             imageLoadingComplete()
+        }
+    }
+    
+    private func loadThumbnail() {
+        guard let asset = avAsset else {
+            return
+        }
+        let assetImgGenerator = AVAssetImageGenerator(asset: asset)
+        
+        do {
+            let image = try assetImgGenerator.copyCGImage(at: CMTime(seconds: 1, preferredTimescale: 600), actualTime: .none)
+            placeholderImage = UIImage(cgImage: image)
+        } catch {
+            print(error.localizedDescription)
+            return
         }
     }
 
