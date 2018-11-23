@@ -971,11 +971,12 @@ open class MediaBrowser: UIViewController, UIScrollViewDelegate, UIActionSheetDe
         if index < thumbMedias.count {
             if nil == thumbMedias[index] {
                 if let d = delegate {
-                    media = d.thumbnail(for: self, at: index)
-                
-                    if let p = media {
-                        thumbMedias[index] = p
+                    if let tempMedia = d.thumbnail(for: self, at: index) {
+                        thumbMedias[index] = tempMedia
+                    } else {
+                        thumbMedias[index] = d.media(for: self, at: index)
                     }
+                    media = thumbMedias[index]
                 }
             } else {
                 media = thumbMedias[index]

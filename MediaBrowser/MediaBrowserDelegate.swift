@@ -43,7 +43,7 @@ public protocol MediaBrowserDelegate: class {
      - Parameter mediaBrowser: MediaBrowser
      - Parameter index: Int
      */
-    func thumbnail(for mediaBrowser: MediaBrowser, at index: Int) -> Media
+    func thumbnail(for mediaBrowser: MediaBrowser, at index: Int) -> Media?
 
     /**
      Optional protocol to show captionView. return MediaCaptionView.
